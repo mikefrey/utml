@@ -1,0 +1,11 @@
+{
+  "name" : "utml",
+  "version" : "0.1.0",
+  "description" : "Express compliant templating for underscore.js",
+  "keywords" : ["underscore", "express", "template", "templating", "engine"],
+  "files" : ["utml.js"],
+  "author" : "Mike Frey <frey.mike@gmail.com> (http://freyday.com)",
+  "main" : "./utml.js",
+  "dependencies" : { "underscore" : ">=1.1.3", "express" : ">=2.0.0"},
+  "engines" : { "node" : ">=0.2.0" }
+}
