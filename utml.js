@@ -13,21 +13,35 @@ var _ = require('underscore');
 
 
 /**
- * Version
+ * Module Version
  */
 exports.version = '0.1.0';
 
+
+/**
+ * Default Options object
+ */
 
 var optionDefaults = {
   cache:true
 };
 
 
+/**
+ * Template cache
+ */
+
 var cache = {};
 
 
+/**
+ * Clear template cache for the given 'filename', otherwise clear the whole cache
+ *
+ * @param {String} filename
+ * @api public
+ */
 
-function clearCache(filename) {
+var clearCache = exports.clearCache = function(filename) {
   if (filename) 
     delete cache[filename];
   else
@@ -35,9 +49,16 @@ function clearCache(filename) {
 }
 
 
+/**
+ * Compile the given 'source' utml into a 'Function'
+ * 
+ * @param {String} source
+ * @param {Object} options
+ * @return {Function}
+ * @api public
+ */
 
-
-function compile(source, options) {
+var compile = exports.compile = function(source, options) {
   if (typeof source === 'string') {
     var tmpl = _.template(source);
     if (options.filename && options.cache) 
@@ -51,8 +72,22 @@ function compile(source, options) {
 
 
 
+/**
+ * Render the given 'str' of utml
+ * 
+ * Options:
+ *  - 'locals'    Local variables object
+ *  - 'cache'     Compiled functions are cached, requires 'filename', default: true
+ *  - 'filename'  Used by 'cache' to key caches
+ *  - 'scope'     Function execution context
+ * 
+ * @param {String} str
+ * @param {Object} options
+ * @return {String}
+ * @api public
+ */
 
-function render(str, options) {
+var render = exports.render = function(str, options) {
   var fn, locals;
   
   options = _.extend({}, optionDefaults, options || {});
@@ -80,10 +115,9 @@ function render(str, options) {
 
 
 
-exports.compile = compile
-exports.render = render;
-exports.clearCache = clearCache;
-
+/**
+ * Expose to require()
+ */
 
 if (require.extensions) {
   require.extensions['.utml'] = function(module, filename) {
