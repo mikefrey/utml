@@ -1,8 +1,7 @@
 UTML: Underscore Template Markup Language
 =========================================
 
-UTML
-
+UTML is a wrapper around the underscore.js template method to make it comply with the express web framework.
 
 ## Installing
 
