@@ -1,0 +1,20 @@
+<html>
+<head>
+  <title>Subtemplating</title>
+</head>
+<body>
+  <h1><%= title %></h1>
+
+  <ul>
+    <%
+    for(var i = 0; i < people.length; i++) {
+      print(subtemplate({ name:people[i] }));
+    }
+    
+    _.each(people, function(name){
+      print(subtemplate({ name:name }));
+    });
+    %>
+  </ul>
+</body>
+</html>
