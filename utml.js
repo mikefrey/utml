@@ -9,13 +9,14 @@
 /**
  * Dependencies
  */
-var _ = require('underscore');
+var _ = require('underscore'),
+  fs = require('fs');
 
 
 /**
  * Module Version
  */
-exports.version = '0.1.0';
+exports.version = '0.2.0';
 
 
 /**
@@ -49,6 +50,46 @@ var clearCache = exports.clearCache = function(filename) {
 }
 
 
+
+/**
+ * Get a template from the cache
+ * 
+ * @param {object} options
+ * @return {Function}
+ */
+
+function fromCache(options) {
+  var filename = options.filename;
+  if (options.cache) {
+    if (filename) {
+      if (cache[filename]) {
+        console.log('found template in cache' + filename);
+        return cache[filename];
+      }
+    }
+    else {
+      throw new Error('filename is required when using the cache option');
+    }
+  }
+  return false;
+}
+
+/**
+ * Store the given fn in the cache
+ * 
+ * @param {Function} fn
+ * @param {object} options
+ */
+
+function cacheTemplate(fn, options) {
+  if (options.cache && options.filename) {
+    console.log('template cached - ' + options.filename);
+    cache[options.filename] = fn;
+  }
+}
+
+
+
 /**
  * Compile the given 'source' utml into a 'Function'
  * 
@@ -61,12 +102,46 @@ var clearCache = exports.clearCache = function(filename) {
 var compile = exports.compile = function(source, options) {
   if (typeof source === 'string') {
     var tmpl = _.template(source);
-    if (options.filename && options.cache) 
-      cache[options.filename] = tmpl;
+    cacheTemplate(tmpl, options);
     return tmpl;
   }
   else {
     return source;
+  }
+}
+
+/**
+ * Compiles a utml file into a 'Function'
+ * 
+ * @param {String} path
+ * @param {object} options
+ * @param {Function} fn
+ * @return {Function}
+ * @api public
+ */
+
+var compileFile = exports.compileFile = function(path, options, fn) {
+  if (typeof options === 'function') {
+    fn = options;
+    options = _.extend({}, optionDefaults);
+  }
+  options.filename = path;
+  
+  var tmpl = fromCache(options);
+  
+  if (tmpl) {
+    return fn(null, tmpl);
+  }
+  else {
+    return fs.readFile(path, 'utf8', function(err, str) {
+      if (err) return fn(err);
+      try {
+        return fn(null, compile(str, options));
+      }
+      catch (err) {
+        return fn(err);
+      }
+    });
   }
 }
 
@@ -93,25 +168,48 @@ var render = exports.render = function(str, options) {
   options = _.extend({}, optionDefaults, options || {});
   locals = _.extend({}, {_:_}, options.locals || {});
   
-  if (options.cache) {
-    if (options.filename) {
-    	fn = cache[options.filename] || compile(str, options);
-    }
-    else {
-      throw new Error('"cache" option requires "filename".');
-    }
-  }
-  else {
-    fn = compile(str, options);
-  }
+  fn = (typeof str === 'function') && str || fromCache(options) || compile(str, options);
   
   if (options.scope) {
-    fn.call(options.scope, locals);
+    return fn.call(options.scope, locals);
   }
   else {
-    fn(locals);
+    return fn(locals);
   }
 }
+
+/**
+ * Renders the utml file at the given path
+ * 
+ * @param {String} path
+ * @param {object} options
+ * @param {Function} fn
+ * @return {String}
+ * @api public
+ */
+
+var renderFile = exports.renderFile = function(path, options, fn) {
+  console.log('renderFile');
+  if (typeof options === 'function') {
+    fn = options;
+    options = _.extend({}, optionDefaults);
+  }
+  options.filename = path;
+  
+  if (fromCache(options)) {
+    return fn(null, render('', options));
+  }
+  else {
+    compileFile(path, options, function(err, tmpl) {
+      if (err) return fn(err);
+
+      return fn(null, render(tmpl, options));
+    });
+  }
+}
+
+
+
 
 
 
@@ -121,7 +219,7 @@ var render = exports.render = function(str, options) {
 
 if (require.extensions) {
   require.extensions['.utml'] = function(module, filename) {
-    source = require('fs').readFileSync(filename, 'utf-8');
+    source = fs.readFileSync(filename, 'utf8');
     module._compile(compile(source, {}), filename);
   };
 }
