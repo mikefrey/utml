@@ -63,7 +63,6 @@ function fromCache(options) {
   if (options.cache) {
     if (filename) {
       if (cache[filename]) {
-        console.log('found template in cache' + filename);
         return cache[filename];
       }
     }
@@ -83,7 +82,6 @@ function fromCache(options) {
 
 function cacheTemplate(fn, options) {
   if (options.cache && options.filename) {
-    console.log('template cached - ' + options.filename);
     cache[options.filename] = fn;
   }
 }
@@ -189,7 +187,6 @@ var render = exports.render = function(str, options) {
  */
 
 var renderFile = exports.renderFile = function(path, options, fn) {
-  console.log('renderFile');
   if (typeof options === 'function') {
     fn = options;
     options = _.extend({}, optionDefaults);

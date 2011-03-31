@@ -1,6 +1,6 @@
 {
   "name" : "utml",
-  "version" : "0.1.0",
+  "version" : "0.2.0",
   "description" : "Express compliant templating for underscore.js",
   "keywords" : ["underscore", "express", "template", "templating", "engine"],
   "files" : ["utml.js"],
