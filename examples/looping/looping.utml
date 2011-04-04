@@ -1,0 +1,22 @@
+<html>
+<head>
+  <title>UTML - Looping</title>
+</head>
+<body>
+  <h1><%= title %></h1>
+  
+  <h2>'for' loop</h2>
+  <ul>
+    <% for(var i = 0; i < people.length; i++) { %>
+      <li><%= people[i] %></li>
+    <% } %>
+  </ul>
+  
+  <h2>Underscore's .each</h2>
+  <ul>  
+    <% _.each(people, function(name){ %>
+      <li><%= name %></li>
+    <% }); %>
+  </ul>
+</body>
+</html>

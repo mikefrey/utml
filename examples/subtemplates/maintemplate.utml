@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title>Subtemplating</title>
+  <title>UTML - Subtemplating</title>
 </head>
 <body>
   <h1><%= title %></h1>
