@@ -165,6 +165,10 @@ var render = exports.render = function(str, options) {
   
   options = _.extend({}, optionDefaults, options || {});
   locals = _.extend({}, {_:_}, options.locals || {});
+
+  if (options.filename) {
+    locals.include = include(options.filename, options);
+  }
   
   fn = (typeof str === 'function') && str || fromCache(options) || compile(str, options);
   
@@ -207,7 +211,24 @@ var renderFile = exports.renderFile = function(path, options, fn) {
 
 
 
+function include(basename, options) {
+  var path = require('path');
 
+  return function(name) {
+    var filePath = path.resolve(path.dirname(basename), name);
+    if (!path.extname(name)) {
+      filePath += '.html';
+    }
+
+    options = _.extend(options, {filename:filePath});
+
+    var tmpl = fs.readFileSync(filePath, 'utf8');
+    return render(tmpl, options);
+  }
+}
+
+
+exports.__express = exports.renderFile;
 
 
 /**
